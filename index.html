@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Items Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">Daily Items Tracker</h1>
+      <button class="theme-toggle" id="themeToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 2V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 20V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4.93 4.93L6.34 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M17.66 17.66L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4.93 19.07L6.34 17.66" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M17.66 6.34L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-value" id="totalItems">0</div>
+        <div class="summary-label">Total Items</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-value" id="totalQuantity">0</div>
+        <div class="summary-label">Total Quantity</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-value" id="totalAmount">RS0.00</div>
+        <div class="summary-label">Total Amount</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Add New Item</h2>
+      <form id="addItemForm">
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="itemName">Item Name</label>
+            <input type="text" id="itemName" class="input-field" placeholder="Enter item name" required>
+          </div>
+          <div class="input-group">
+            <label for="itemPrice">Price</label>
+            <input type="number" id="itemPrice" class="input-field" placeholder="Price" min="0" step="0.01" required>
+          </div>
+          <div class="input-group">
+            <label for="itemQuantity">Quantity</label>
+            <div class="quantity-container">
+              <input type="number" id="itemQuantity" class="input-field" placeholder="Qty" min="0.001" step="0.001" value="1" required>
+              <select id="itemUnit" class="input-field unit-select">
+                <option value="pcs">pcs</option>
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="L">L</option>
+                <option value="m">m</option>
+                <option value="ft">ft</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="clientName">Client Name</label>
+            <input type="text" id="clientName" class="input-field" placeholder="Enter client name">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Item</button>
+      </form>
+    </div>
+
+    <!-- Rest of the HTML remains the same -->
+    <div class="card">
+      <h2>Current Items</h2>
+      <div id="itemsTableContainer">
+        <table class="items-table" id="itemsTable">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody">
+            <!-- Items will be added here -->
+          </tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state">
+        No items added yet. Add your first item above.
+      </div>
+      <div class="btn-group">
+        <button id="clearAllBtn" class="btn btn-danger" disabled>Clear All</button>
+        <button id="generateBillBtn" class="btn btn-primary" disabled>Generate Bill</button>
+      </div>
+    </div>
+
+    <div class="card" id="billCard" style="display: none;">
+      <h2>Bill Preview</h2>
+      <div class="bill-preview" id="billPreview">
+        <div class="bill-header">
+          <div class="bill-title">Invoice</div>
+          <div class="bill-date" id="billDate"></div>
+        </div>
+        <table class="bill-table" id="billItemsTable">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="billItemsTableBody">
+            <!-- Bill items will be added here -->
+          </tbody>
+        </table>
+        <div class="bill-total">Total: <span id="billTotal">RS0.00</span></div>
+      </div>
+      <div class="btn-group">
+        <button id="saveBillBtn" class="btn btn-primary">Save Bill</button>
+        <button id="downloadPdfBtn" class="btn btn-primary">Download PDF</button>
+        <button id="closeBillBtn" class="btn">Close</button>
+      </div>
+    </div>
+
+    <div class="card" id="savedBillsCard">
+      <h2>Saved Bills</h2>
+      <div id="savedBillsList" class="saved-bills-container">
+        <div id="noSavedBills" class="empty-state">
+          No bills saved yet. Generate and save a bill to see it here.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
